@@ -488,17 +488,18 @@ class TTGammaProcessor(processor.ProcessorABC):
         ##################
 
         # PART 2A: Uncomment to begin implementing event variables
-        """
+
         # 2. DEFINE VARIABLES
         ## Define M3, mass of 3-jet pair with highest pT
         # find all possible combinations of 3 tight jets in the events 
         #hint: using the ak.combinations(array,n) method chooses n unique items from array. Use the "fields" option to define keys you can use to access the items
-        triJet=ak.combinations(???)
+        triJet=ak.combinations(tightJet, 3,  fields=["first","second", "third"])
         #Sum together jets from the triJet object and find its pt and mass
-        triJetPt = (???).pt
-        triJetMass = (???).mass
+        
+        triJetPt = (triJet.first + triJet.second + triJet.third).pt
+        triJetMass = (triJet.first + triJet.second + triJet.third).mass
         # define the M3 variable, the triJetMass of the combination with the highest triJetPt value (using the .argmax() method with axis=-1,keepdims=True)
-        M3 = triJetMass[???]
+        M3 = triJetMass[ak.argmax(triJetPt, axis=-1, keepdims=True)]
 
         leadingMuon = tightMuon[:,:1]
         leadingElectron = tightElectron[:,:1]
@@ -509,21 +510,21 @@ class TTGammaProcessor(processor.ProcessorABC):
         # 2. DEFINE VARIABLES
 
         # define egammaMass, mass of combinations of tightElectron and leadingPhoton (hint: using the ak.cartesian() method)
-        egammaPairs = ?
+        egammaPairs = ak.cartesian({"pho":leadingPhoton, "ele":tightElectron})
         # avoid erros when egammaPairs is empty
         if ak.all(ak.num(egammaPairs)==0):
             egammaMass = np.ones((len(events),1))*-1
         else:
-            egammaMass = ??
+            egammaMass = (egammaPairs.pho + egammaPairs.ele).mass
 
         # define mugammaMass, mass of combinations of tightMuon and leadingPhoton (hint: using the ak.cartesian() method) 
         mugammaPairs = ak.cartesian({"pho":leadingPhoton, "mu":tightMuon})
         if ak.all(ak.num(mugammaPairs)==0):
             mugammaMass = np.ones((len(events),1))*-1
         else:
-            mugammaMass = ??
-        """
+            mugammaMass = (mugammaPairs.pho + mugammaPairs.mu).mass
 
+           
         ###################
         # PHOTON CATEGORIES
         ###################
@@ -531,6 +532,8 @@ class TTGammaProcessor(processor.ProcessorABC):
         # Define photon category for each event
         phoCategory = np.ones(len(events))
         phoCategoryLoose = np.ones(len(events))
+
+        
 
         # PART 2B: Uncomment to begin implementing photon categorization
         """
