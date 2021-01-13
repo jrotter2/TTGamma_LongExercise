@@ -402,8 +402,8 @@ class TTGammaProcessor(processor.ProcessorABC):
         # electron events should be triggered by HLT_Ele27_WPTight_Gsf trigger
         # HINT: trigger values can be accessed with the variable events.HLT.TRIGGERNAME, 
         # the bitwise or operator can be used to select multiple triggers events.HLT.TRIGGER1 | events.HLT.TRIGGER2
-        muTrigger  = events.HLT.HLT_IsoMu24 | events.HLT.HLT_IsoTkMu24
-        eleTrigger = events.HLT.HLT_Ele27_WPTight_Gsf
+        muTrigger  = (events.HLT.IsoMu24 | events.HLT.IsoTkMu24)
+        eleTrigger = events.HLT.Ele27_WPTight_Gsf
 
         # 1. ADD SELECTION
         #  Event selection
@@ -435,7 +435,7 @@ class TTGammaProcessor(processor.ProcessorABC):
         #                                            have no electrons
         #                                            have no loose muons
         #                                            have no loose electrons
-        muon_eventSelection = (muonTrigger & 
+        muon_eventSelection = (muTrigger & 
                              passOverlapRemoval & 
                              oneMuon & 
                              eleVeto & 
@@ -452,7 +452,7 @@ class TTGammaProcessor(processor.ProcessorABC):
         electron_eventSelection = (eleTrigger & 
                              passOverlapRemoval & 
                              oneEle & 
-                             muonVeto & 
+                             muVeto & 
                              looseMuonVeto &
                              looseElectronVeto
                             )
@@ -464,8 +464,8 @@ class TTGammaProcessor(processor.ProcessorABC):
         #create a selection object
         selection = PackedSelection()
 
-        selection.add('eleSel', electron_eventSelection
-        selection.add('muSel', muon_eventSelection
+        selection.add('eleSel', electron_eventSelection)
+        selection.add('muSel', muon_eventSelection)
 
         #add two jet selection criteria
         #   First, 'jetSel' which selects events with at least 4 tightJet and at least one bTaggedJet
