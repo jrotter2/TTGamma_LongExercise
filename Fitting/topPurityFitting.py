@@ -40,10 +40,12 @@ for syst in systematics:
     ## Create an array 'mc' of histograms from TopPair and NonTop categories
     mc = TObjArray(2)   
     ## Add TopPair and NonTop histograms to the array 'mc'
-    histNames = [key.GetName() for key in _file.GetListOfKeys()]
-    mc.Add([h for h in histNames if syst in h and "TopPair" in h])
-    mc.Add([h for h in histNames if syst in h and "NonTop" in h])
+    mc.Add(_file.Get("TopPair_"+syst))
+    mc.Add(_file.Get("NonTop_"+syst))
     
+    if not _file.Get("TopPair_"+syst):
+        print(syst)
+        continue
     ## Fit the MC histograms to data 
     fit = TFractionFitter(data, mc, "q")
     
@@ -58,13 +60,12 @@ for syst in systematics:
         
     ## Get the value of fit parameter and its error for the TopPair MC category: 
     topPurity = fit.GetFitter().Result().Parameters()[0]
-    topPurityErr = fit.GetFitter().Result().ParError()[0]
+    topPurityErr = fit.GetFitter().Result().ParError(0)
     
     ## Fill the dictionary "results" with the topPurity and topPurityErr for each systematic
     results[syst] = (topPurity, topPurityErr)
 
     del fit
-
 
 pp = pprint.PrettyPrinter(indent=4)
 pprint.pprint(results)
